@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>About the OS</title>
+ 
+    <!-- Bootstrap -->
+    <link href="bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" href="style.css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+  	<div class="container my-custom-container">
+  		
+		<h1>Operating System</h1>
+		<h2>1.About Minix</h2>
+		<h3>1.1 Introduction</h3>
+		Minix was earlier developed for educational purposes by Prof. Andrew Tanenbaum. Starting with MINIX 3, the primary aim of development shifted from educational to the creation of highly reliable, secure and flexible microkernel OS. 
+		<h3>1.2 four-level heirarchy in Minix</h3><p>
+		A minimal kernel provides
+		interrupt handlers, a mechanism for starting and stopping processes, a scheduler,
+		and interprocess communication. Logically, server and driver processes are structured into three layers, although they all are user-mode processes as seen by the kernel. The lowest level contains device drivers. Above this layer are the server processes - VFS server, underlying file system implementations, process server, reincarnation server etc. On top of these servers come the ordinary user processes including shells, compilers, utilities and application programs.
+		<br>
+		<img src="fourlevel.png">
+			
+		<h2>2.About Minix 3.2</h2>
+		<p>Minix 3.2 is different from earlier versions in Minix 3 in the design of the file system and its dealing with related system calls. A <a href="vfs.html">Virtual file system</a> is added as a layer between user library and the minix file system for the purpose of abstraction and uniform implemetation. Visit the <a href="www.minix3.org">official website</a> for further information.  </p>
+			
+		<h2>3.Detailed Working of the System</h2>
+			<h3>3.1 <a href="filesystem.html">File System</a></h3>
+			<h3>3.2 <a href="pm.html">Process Management</a></h3>
+			<h3>3.3 <a href="memorymgmt.html">Memory Management</a></h3>
+			<h3>3.4 <a href="io.html">Input-Output</a></h3>
+			<h3>3.5 <a href="ipc.html">Inter-Process Communication</a></h3>
+		<p>Reference : <a href="http://www.minix3.org/">http://www.minix3.org/</a>
+ 	</div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+  </body>
+</html>

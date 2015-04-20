@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Startup</title>
+ 
+    <!-- Bootstrap -->
+    <link href="bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" href="style.css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+  	<div class="container my-custom-container">
+	    <h1>Startup</h1>
+		<p>
+			When computer is turned on, the hardware reads the first <span class="make-bold">sector</span> of the first track of the <a class="make-bold" href="ref.html#bootdisk">boot disk </a>and executes the code it finds there
+		</p>
+		<p>
+			The <span class="make-bold">sector</span> contains the bootstrap program which loads the larger program, <span class="make-bold">boot</span>, which then loads the Operating System</p>
+		<p>
+			If the boot disk is a <span class="make-bold">hard disk</span>, which is divided into partitions then the 
+			first sector of the hard disk contains a <span class="make-bold">small program</span> and the 
+			<span class="make-bold">disk partition table</span> collectively called <span class="make-bold">Master boot 
+			record.</span> Program part is executed to read the partition table and the select the 
+			<a class="make-bold" href="ref.html#activepartition">active partition</a>, which contains the 
+			<span class="make-bold"> bootstrap</span> program. 
+		</p>
+		<h2>Sequence of loading</h2>
+		<ol>
+			<li><a href="ref.html#kernel" class="make-bold">Kernel</a></li>
+			<li><a href="ref.html#processmanager" class="make-bold">Process Manager</a></li>
+			<li><a href="ref.html#filesystem" class="make-bold">File System</a></li>
+			<li><a href="ref.html#reincarnationserver" class="make-bold">Reincarnation Server</a></li>
+			<li><a href="ref.html#init" class="make-bold">Init Program</a></li>
+
+		</ol>
+
+		<p>
+			The sequence of loading of minix operating system can be made more clear with following diagram 
+			<img src="images/components1.png" alt="Component of Minix Operating System">
+			<img src="images/components2.png" alt="Component of Minix Operating System">
+		</p>
+
+		<p>
+			<div> All parts of boot image are  separate program i.e. Kernel, process manager, file system, init etc are all separate program. <span class="make-bold"> Init</span> is the first user process and last process which is loaded as a part of boot image (in general). </div>
+			<div>
+				In case of minix there are few processes that start running before init process. They are listed below:
+				<ul>
+					<li><span class="make-bold">CLOCK and SYSTEM </span>- they have no PID's and run within the kernel i.e. they are not visible to the user
+					</li>
+					<li>
+						<span class="make-bold">Process Manager</span> - The first process to run in user space and has PID 0. It has no child and no parent. 
+					</li>
+					<li>
+						<span class="make-bold">Reincarnation Server</span> - Parent of all other processes that started from boot image.
+					</li>
+
+				</ul>
+			</div>
+		</p>
+		<p>
+			<div>
+				Init is one of the child of reincarnation server. It runs <span class="make-bold">/etc/rc</span> shell script, which starts additional drivers and servers that are not a part of the boot image. All programs started by rc script is child of init process. 	
+			</div>
+			<div>
+				<span class="make-bold">Service </span>runs as a child of init process but has little variation from conventional process. Service is a user interface to reincarnation server which starts an ordinary program and converts service into system process. Service starts <span class="make-bold">Floppy, CMOS, and Information Server(IS). </span> After "CMOS" driver has been started, <span class="make-bold">rc script</span> can initialize the  real time clock. All servers and drivers are inside <span class="make-bold">'/sbin'</span> directory and other commands needed for startup are in <span class="make-bold">'/bin'</span> directory.
+			</div>
+		</p>
+		<p>
+			After <span class="make-bold">Initial Startup</span> are completed <a href="ref.html#filesystem"> File System </a> such as <span class="make-bold">'/usr'</span> are mounted. <span class="make-bold">rc</span> checks for filesystem problem that might be the result of previous system crash.
+			<ul>
+				<li>
+					When the system is shut down using <span class="make-bold">shutdown </span>command an entry is written to the login history file, <span class="make-bold">"/usr/adm/wtmp"</span>. The command <span class="make-bold">shutdown c</span> checks if the last entry in <span class="make-bold">wtmp</span> is shutdown entry.
+				</li> 
+				<li>
+					If <span class="make-bold">not</span> means abnormal shutdown and <span class="make-bold">fsck</span> is used to check file system.	
+				</li>
+			</ul>
+		</p>
+		<p>
+			Init reads <span class="make-bold">/etc/ttytab</span> which lists all potential terminal devices. Each login terminals have an entry in <span class="make-bold">getty</span> field of <span class="make-bold">/etc/ttytab</span>. <span class="make-bold">Init</span> forks child processes for each terminal and each child process execute <span class="make-bold">/usr/bin/getty</span> which prints a login message and waits for a name to be typed. 
+		</p>
+		<p>
+			If some particular terminal requires special treatment then <span class="make-bold">/etc/ttytab</span> can specify a command (eg <span class="make-bold">/usr/bin/stty</span>) to be executed to initialize the line before running <span class="make-bold">getty</span>.
+		</p>
+		<p>
+			When user types the <span class="make-bold">login name</span>, 
+			<ul>
+				<li>
+					<span class="make-bold">/usr/bin/login</span> is called with <span class="make-bold">name</span> as argument.
+				</li>
+				<li>
+					<span class="make-bold">login</span> program checks if password is required, if yes then it prompts for and verifies the password
+				</li>
+				<li>
+					After successful login, <span class="make-bold">login</span> executes users shell i.e. <span class="make-bold">/bin/sh</span> by default, other shell may be specified in <span class="make-bold">/etc/passwd</span> file.
+				</li>
+				<li>
+					<span class="make-bold">Shell</span> waits for commands to be typed and then forks off new processes. 
+				</li>
+				<li>
+					<span class="make-bold">Shells</span> are <span class="make-bold">children</span> of <span class="make-bold">init</span> and <span class="make-bold">user processes</span> are <span class="make-bold">grand children</span> of <span class="make-bold">init</span>.
+				</li>
+			</ul>
+		</p>
+		<p>
+			Most important system calls for minix are <span class="make-bold">fork</span> and <span class="make-bold">exec</span> 
+			<ul>
+				<li>
+					fork is the only way to create new process
+				</li>
+				<li>
+					exec allows a process to execute a specified program
+				</li>
+				<li>
+					when a program is executed it is allocated a portion of memory whose size is specified in program files header. 
+				</li>
+			</ul>
+			All information about processes are kept in <a href="ref.html#processtable">process table</a>
+			<ul>
+				<li>
+					<span class="make-bold">Process Table</span> is divided into <span class="make-bold">Kernel, process manager and file system</span> 
+				</li>
+				<li>
+					When a process comes into existence (by fork) or terminates (by exit) the process manager updates the process table first and then send messages to the file system and the kernel.
+				</li>
+			</ul>
+		</p>
+ 	</div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+  </body>
+</html>

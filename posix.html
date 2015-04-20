@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>System Calls</title>
+ 
+    <!-- Bootstrap -->
+    <link href="bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" href="style.css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+  	<div class="container">
+		  		<h1>Posix System Calls</h1>
+
+		<h2>What is POSIX</h2>
+		<p>Portable Operating System Interface,is a family of standards specified by the IEEE for maintaining compatibility between operating systems. POSIX defines the application programming interface (API), along with command line shells and utility interfaces, for software compatibility with variants of Unix and other operating systems.<p>
+
+		<h2>How System Calls Work (in earlier MINIX versions)</h2>
+		<p>Basically Servers handle the system calls. Servers contain the program for System Call Handler. Each System Call also has an entry in User Library, which packages the parameters for system call and calls the handler on appropriate server.<p>
+		<p>A <b>System Call Handler</b> is placed in appropriate <b>server</b> in <code>/usr/src/servers</code> directory. Eg. A handler for a system call which deals with files will be put in <code>/usr/src/servers/fs</code> directory. Each server source directory contains two important files - <b>table.c</b> and <b>proto.h</b>. </p>
+		<p>In each line in file table.c, address of system call handler function is assigned to one entry in table and index of entry is the system call number. It basically contains definition for <code>call_vec_table</code>, which is an array of function pointers that is indexed by the system call numbers.Eg.</p>
+		<code>do_write, /* 4 = write */ <br>
+		 do_open, /* 5 = open */ <br>
+		 do_close, /* 6 = close */<br>
+		</code> 
+
+		<p>In proto.h, prototypes of system call handlers are declared eg.<code> _PROTOTYPE(int do_systemCall(void));</code></p>
+		<p>the files such as misc.c, stadir.c, write.c, read.c contain the definitions for system call handler functions. A system call handler funtion is called by <code>PUBLIC int _syscall(int who, int syscallnr, register *msgptr); </code>. The parameter "who" refers to the recipent process id, syscallnr to system call number and *msgptr is reference to message data structure which can be used to pass additional parameters.<br> 
+
+		eg.<code> message m;<br>
+		    _syscall(FS, 89, &m);</code>
+		</p>
+		<p>The user library function <code>do_mySystemCall</code> is implemented in <code>mySystemCall.c</code> placed in <code>/usr/src/lib/posix</code>.This function calls system call handler using <code>_syscall(int who, int syscallnr, register *msgptr);</code>.</p>
+
+		<h2>Sequence in Earlier MINIX versions</h2>
+		<p>1. A user program invokes the system call <code>mySystemCall()</code>.<p>
+		<p>2. It is then handled by user library funtion.<br>
+		<code>PUBLIC int mySystemCall(void)<br> 
+		{ 
+		 message m; <br>
+		 return(_syscall(FS,SYSCALL,&m));<br> 
+		} </code><br>
+		<p>3. Now it is handled by the system call handler in the server, which is mapped using system call number, where the handler is defined.</p>
+		<p>4. Any return parameters and other data is communicated through the message data structure. </p>
+
+		<h2>How MINIX 3.2 is different</h2>
+		File System in MINIX 3.2 is different from the earlier versions because of inclusion of <a href="vfs.html">Virtual File System</a> in it.
+		It acts as an interface between FS and User processes to increase modularity and abstraction.
+
+
+		<h2>Important POSIX System Calls in File System in MINIX 3.2</h2>
+		<p>Some important system calls in file system are - open, close, create, delete, write. They are explaned in detail in <a href="fsImplementation.html">Implementation of System Calls in File System</a>.</p>
+
+
+		<p>Reference :<a href="http://www.cis.syr.edu/~wedu/seed/Labs/Documentation/Minix3/How_to_add_system_call.pdf"> http://www.cis.syr.edu/~wedu/seed/Labs/Documentation/Minix3/How_to_add_system_call.pdf </a></p>
+	<br>
+	<br>
+ 	</div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+  </body>
+</html>

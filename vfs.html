@@ -1,0 +1,88 @@
+<html>
+<head>
+<title>Virtual File System</title>
+</head>
+<body>
+<h1>Virtual File System</h1>
+<h2>What is Virtual File System</h2><p>
+The Virtual File System is an abstraction layer over the file system implementations in the operating system. It handles all system calls related to the file syste and allows for client applications to access different types os file systems in a uniform way. It also provides a common interface to several kinds of file system implementations.</p>
+
+<h2>Data Structures in VFS</h2>
+
+<p><h3>1. Vnode object</h3>
+The vnode object refers to an inode. It contains the on disk inode number, the
+endpoint number of the File system where the ﬁle resides, the type of the ﬁle and
+the ﬁle size.</p>
+<h3>2. Vmnt Object</h3>
+<p>It represents a mounted file system. It contains the device number, the mount flags, the maximum file size on the given partition. It refers to the mounted file system's root vnode and to the vnode on which the file system is mounted on<p>
+<h3>3. Filp Object</h3>
+<p>The filp object represents an open file. It specifies how the file was opened, which vnode it refers to and the current file position. The rest of the fields are used by the implementation of the select system call.</p>
+
+<h3>4. File_lock object</h3>
+<p>Structure used to manage file locking.Contains a pointer to vnode,lock type- read and write lock, pid of process holding the lock etc.</p>
+<h3>5. Fproc object </h3>
+<p>The fproc object maintains per-process information. It contains working directory's inode number, root directory's inode number, user id, process id, kernel endpoint of the process etc.</p>
+<img src="vfsDS.png">
+<h3>6. Messages</h3>
+<p>All the communication between VFS and caller process and File systems takes place using messages. MINIX messages consist of a general header - which contains the sender process's endpoint number and the message type - and an additional part. The additional part is deined as a union of different structures that were needed for this communication between processes.
+
+<h2>Sequence of funtions in VFS</h2>
+<p>
+VFS spawns worker threads at startup. Main thread fetches requests and replies and hands them off to idle or reply-pending workers.
+There are types of system calls in file systems that are handled in different manners by VFS.<br>
+1. System calls with path name argument eg. mkdir, acccess, chmod, open, create, mknod, chdir, chroot, unlink, utime<br>
+2. System calls with file descriptor argument eg. read, write, lseek <br>
+3. System calls without argument eg. fork, exit, sync, fsync <br>
+</p>
+<h2>Major steps in execution of system call</h2>
+
+<p>Let's consider system call <strong>stat()</strong> with an argument <strong>/usr/web/index.html</strong>. This is help you in understanding VFS and its workflow.</p>
+
+<p>Assume </p>
+
+<ul>
+<li>a ext2 partition mounted at /usr</li>
+<li>root filesystem is Minix filesystem</li>
+</ul>
+
+<h3>Steps</h3>
+
+<ol>
+<li><p>The user process calls the stat() function of the POSIX library which builds the stat request message and sends it to the VFS process.<br>
+(a) The VFS process copies the path name from userspace.   </p></li>
+<li><p>The VFS first issues a lookup for the path name. It determines that the given path is absolute, therefore the root FS process has to be requested to perform
+the lookup.<br>
+(b) The root FS process copies the path name from the VFS address space.   </p></li>
+<li><p>During the lookup in the root FS process the root directory has to be read in order to find the string "usr". Let us assume that this information is not in the
+buffer cache. The root FS asks the Driver process to read the corresponding block from the disk.   </p></li>
+<li><p>The driver reads the block and transfers back to the FS process. It reports OK.<br>
+(c) The driver copies the disk content into the FS buffer cache.    </p></li>
+<li><p>The root FS process examines the "usr" directories inode data and realizes that there is a partition mounted on this directory. It sends the EENTER MOUNT message to the VFS that also contains the number of characters that were processed during the lookup.    </p></li>
+<li><p>The VFS looks up in the virtual mount table which FS process is responsible for the "/usr" partition. The lookup has to be continued in that FS process ( /usr: Mininx filesystem partition). The VFS sends the lookup request and with the rest of the path name.<br>
+d. The "/usr" FS process copies the path name from the VFS address space.    </p></li>
+<li><p>The FS process that handles the "/usr" partition continues the lookup of the path name. It needs additional information from the disk, therefore it asks
+the driver process to read the given block and transfer it into the FS process buffer cache.    </p></li>
+<li><p>The driver reads the disk and transfers back to the FS process. It reports success.<br>
+(e) The driver copies the disk content into the "/usr" FS process buffer cache.    </p></li>
+<li><p>The /usr FS process finishes the lookup and transfers back the inode's details to the VFS.   </p></li>
+<li><p>The VFS has all the necessary information in order to issue the actual REQ STAT request. The FS process is asked to perform the stat() operation.   </p></li>
+<li><p>The FS process fills in the stat buffer. Let us assume that all the information needed for this operation is in the FS process' buffer cache, therefore no
+interaction is involved with the Driver process. The FS copies back to the user process' address space. It reports success for the VFS.<br>
+(f) The FS process copies the stat buffer to the caller process address space.   </p></li>
+<li><p>The VFS receives the response message from the FS process and sends the return value back to the POSIX library. The function reports success back to the user process.   </p></li>
+</ol>
+
+<p><img src="vfsflow.png"></p>
+
+
+
+<h2>Other Roles of Virtual File System in Minix 3.2</h2>
+<p><ol><li> Handle POSIX system calls and other system calls.</li>
+<li>Maintains state and cooperates with process manager to handle the fork, exec and exit system calls.</li>
+<li>Keeps track of endpoints that are drivers for characters or block special files</li>
+</ol>
+
+
+<p>Further Reference : <a href="http://www.minix3.org/theses/gerofi-minix-vfs.pdf">http://www.minix3.org/theses/gerofi-minix-vfs.pdf</a></p>
+</body>
+</html>

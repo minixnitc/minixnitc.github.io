@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Roadmap</title>
+ 
+    <!-- Bootstrap -->
+    <link href="bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" href="style.css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+  	<div class="container">
+	    <h1>Project</h1>
+
+		<h2>1. Understanding Relevant Code</h2>
+		<p>Refer to <a href="os.html">operating system</a> and the links given in reference section of each page.<br>
+		<p>LInk to the book</p>
+		<h2>2. Design</h2>
+		<p>
+		There are two ways in which immediate files can be implemented in the minix operating system -<br>
+		<b>Static :</b> In this approach, the maximum file size is specified at creation and you can't change the type of file once created. In case the immediate file size exceeds the specified size, it will report an error. This is can be implemented by creating a new file system.<br>
+		<b>Dynamic :</b> A file is created as an immediate file and if size exceeds specified size, it becomes a regular file. To implement this approach, we need to make changes in the existing file system.<br>
+
+		<b>Implementation in Dynamic Approach</b>: 
+		To include immediate file system in an existing file system, the following sections are involved -
+		<i>Data structures representing files</i>
+		<i>Virtual File System</i>
+		<i>Message Formats</i>
+		<i>Minix File System </i> : in the funtions of the regular file system of minix, there is almost no change in create, open and close functions. The changes in read, write, delete are made so that if the file is immediate (which can be deduced by comparing size), then there is the content is to be accessed from the inode.</p>
+		<h2>3. Tutorials for Basic Understanding</h2>
+		<ol>
+		<li><a href="http://homepages.cs.ncl.ac.uk/nick.cook/csc2025/minix/">http://homepages.cs.ncl.ac.uk/nick.cook/csc2025/minix/</a></li>
+		<li><a href="http://homepages.cs.ncl.ac.uk/nick.cook/csc2025/minix/familiarisation.html">http://homepages.cs.ncl.ac.uk/nick.cook/csc2025/minix/familiarisation.html</a></li>
+		<li><a href="https://diuf.unifr.ch/pai/education/2004_2005/courses/OS/04_Minix_01">https://diuf.unifr.ch/pai/education/2004_2005/courses/OS/04_Minix_01</a></li></ol>
+		<h2>4. Final Implementation - Coding</h2>
+ 	</div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+  </body>
+</html>

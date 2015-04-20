@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inter-Process Communication</title>
+ 
+    <!-- Bootstrap -->
+    <link href="bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" href="style.css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+  	<div class="container my-custom-container">
+  		<h1>Inter-Process Communication</h1>
+  		<p>
+  			Data structures and function prototypes for interprocess communication are defined in <span class="make-bold">ipc.h</span>. A message is defined as a structure containing a union of the various message types that are possible. Seven message formats, mess_1 through mess_8, are defined (type mess_6 is obsolete). A message is a structure containing a field m_source, telling who sent the message, a field m_type, telling what the message type is (e.g., SYS_EXEC to the system task) and the data fields.
+  		</p>
+  		<p>
+  			The seven message types are shown in Figure below.
+  			<img src="images/messages.png" alt="Message types">
+  		</p>
+	    <p>
+	    	Function calls that are used for <a href="ref.html#interprocesscommunication" class="make-bold">inter-process communication (message passing):</a>
+	    	<ul>
+	    		<li>
+	    			<span class="make-bold">send(dest, &amp;message)</span> - To send message to process dest
+	    		</li>
+	    		<li>
+	    			<span class="make-bold">receive(source, &amp;message)</span> - To receive message from process source
+	    		</li>
+	    		<li>
+	    			<span class="make-bold">sendrec(src-dest, &amp;message)</span> - To send message and wait for reply from the same process. 
+	    		</li>
+	    	</ul>  
+	    </p>
+	    <p>
+	    	The second parameter in each call is the local address of the message data. Message passing mechanism in the kernel copies the message from the sender to the receiver. Reply for <span class="make-bold">sendrec</span>, overwrites the original message. 
+	    </p>
+	    <p>
+	    	Each task, driver, or server is allowed to exchange message only with certain other processes.
+	    	<ul>
+	    		<li>
+	    			Usual flow of messages is downward in the layers
+	    		</li>
+	    		<li>
+	    			Messages can be between processes in same layer or between processes in adjacent layers.
+	    		</li>
+	    		<li>
+	    			User processes cannot send messages to each other
+	    		</li>
+	    		<li>
+	    			User processes in layer 4 can initiate messages to servers in layer 3 and server in layer 3 can initiate message to drivers in layer 2
+	    		</li>
+	    		<li>
+	    			When a process sends a message to a process which is not waiting for a message, the sender blocks until the destination does a receive. 
+	    		</li>
+	    	</ul>
+	    </p>
+	    <p>
+	    	<span class="make-bold">notify(dest)</span> - When a process needs to make another process aware that something important has happened. 
+	    	<ul>
+	    		<li>
+	    			<span class="make-bold">notify</span> is non-blocking i.e. sender continues to execute whether or not recipient is waiting.	
+	    		</li>
+	    		<li>
+	    			Information conveyed is limited, in general only identity of sender and the time-stamp.  
+	    		</li>
+	    		<li>
+	    			This is important when debug dump is to be created as one kind of debug dump corresponds to a particular event. Eg. Ethernet dump will be created only when dump-ethernet stat key is pressed. 
+	    		</li>
+	    		<li>
+	    			Sometimes notification is not sufficient, then the receiver can send request to the sender for more information.
+	    		</li>
+	    		<li>
+	    			Notify call can be made even when the recipient has not done a receive. But those notifications that cannot be received are stored, so that recipient can be informed when it calls receive next time. Pending notification can be stored in recipients <span class="make-bold">pending-notification-bitmap</span> 
+	    		</li>
+	    	</ul> 
+	    </p>
+		
+		<h4 class="make-bold">Reference:</h4>
+        <ul>
+          <li>
+            Operating System Design and Implementation, Third Edition By Andrew S. Tanenbaum and Albert S. Woodhull
+          </li>
+        </ul>
+ 	</div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+  </body>
+</html>

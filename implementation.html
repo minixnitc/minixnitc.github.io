@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Implementation of processes in minix3</title>
+ 
+    <!-- Bootstrap -->
+    <link href="bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" href="style.css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+  	<div class="container my-custom-container">
+  		<h1>Implementation of processes in minix3</h1>
+  		<h4 class="make-bold">Organization of minix3 source code</h4>
+		<p>
+			Full path to <span class="make-bold">C Language</span> source code on standard intel based platform is <span class="make-bold">"/usr/src/"</span>
+		</p>
+		<p>
+			<a href="ref.html#makefile" class="make-bold">Makefile</a> controls the compilation of files in its directory and also directs compilation of files in one or more subdirectories. <span class="make-bold">Make</span> manages efficient compilation of programs involving multiple source files. It also tests previously compiled modules to see if they are up to date and re-compiles whose source files have been modified. 
+		</p>
+		<p>
+			All part of <span class="make-bold">"/src/"</span> tree can be relocated since <span class="make-bold">makefile</span> in each directory uses a relative path to <span class="make-bold">C</span> directories.
+		</p>
+		<p>
+			During compilation every makefile expects to find header files in <span class="make-bold">"/usr/include"</span>. <span class="make-bold">"/usr/src/tools/Makefile"</span> expects to find master copy of header files in <span class="make-bold">"/usr/src/include"</span>. Before recompiling the system, the entire <span class="make-bold">"/usr/include"</span> directory is deleted and <span class="make-bold">"/usr/src/include"</span> is copied to <span class="make-bold">"/usr/include"</span>. This is done to keep all files needed in development of minix3 in one place.
+		</p>
+	   	<p>
+	   		<span class="make-bold">include/</span> contains a number of <span class="make-bold">posix</span> standard files. Following are the subdirectories of <span class="make-bold">include/</span>: 
+	   		<ul>
+	   			<li>
+	   				<span class="make-bold">sys/</span> - Additional posix header. 
+	   			</li>
+	   			<li>
+	   				<span class="make-bold">minix/</span> - Header files used by MINIX3 operating system.
+	   			</li>
+	   			<li>
+	   				<span class="make-bold">ibm/</span> - Header files with ibm-pc specific definitions
+	   			</li>
+	   			<li>
+	   				<span class="make-bold">arpa/</span> and <span class="make-bold">net/</span> - Support network extensions. Not necessary for compiling basic MINIX3 system. 
+	   			</li>
+	   		</ul>
+	   	</p>
+	   	<p>
+	   		<span class="make-bold">src/</span> directory also contains following subdirectories: 
+	   		<ul>
+	   			<li>
+	   				<span class="make-bold">kernel/</span> - Layer1 (Scheduling, messages, clock and system tasks)
+	   			</li>
+	   			<li>
+	   				<span class="make-bold">drivers/</span> - Layer2 (Device driver for disk, console printer etc)
+	   			</li>
+	   			<li>
+	   				<span class="make-bold">servers/</span> - Layer3 (process manager, file system and other servers)
+	   			</li>
+	   			<li>
+	   				<span class="make-bold">lib/</span> - Source code for library procedures (open, read etc)
+	   			</li>
+	   			<li>
+	   				<span class="make-bold">tools/</span> - Makefile and scripts for building MINIX3 system. 
+	   			</li>
+	   			<li>
+	   				<span class="make-bold">boot/</span> - Code for booting and installing MINIX3
+	   			</li>
+	   		</ul>
+	   	</p>
+	   	<p>
+	   		<span class="make-bold">/src/servers</span> contains following subdirectories:
+	   		<ul>
+	   			<li>
+	   				<span class="make-bold">pm/</span> - Process manager
+	   			</li>
+	   			<li>
+	   				<span class="make-bold">mfs/</span> - Main file system
+	   			</li>
+	   			<li>
+	   				<span class="make-bold">Init Program</span>
+	   			</li>
+	   			<li>
+	   				<span class="make-bold">rs/</span> - Reincarnation Server
+	   			</li>
+	   			<li>
+	   				<span class="make-bold">inet/</span> - Network server source code
+	   			</li>
+	   		</ul>
+	   	</p>
+	   	<p>
+	   		<span class="make-bold">src/test/</span> - is used to test a newly compiled MINIX3 System.
+	   	</p>
+	   	<p>
+	   		<span class="make-bold">src/command/</span> - contains source code for programs like <span class="make-bold">cat, cp, date, ls, pwd etc.</span>
+	   	</p>
+	   	<p>
+	   		<span class="make-bold">src/kernel/const.h</span> - Defines the constants used in the Kernel
+	   	</p>
+	   	<p>
+	   		<span class="make-bold">src/servers/pm/const.h</span> - Defines constants used by process manager
+	   	</p>
+	   	<h4 class="make-bold">Memory layout after MINIX3 has been loaded from disk into memory</h4>
+	   	<p>
+	   		The kernel, drivers and servers are independently compiled and linked programs as listed on the left in following image.
+	   		<img src="images/memoryLayout.png" alt="Memory layout of Minix 3">
+	   	</p>
+	   	<p>
+	   		Minix 3 consists of totally independent programs that communicate only by message passing. The procedures that the three pieces of os have in common are in <span class="make-bold">/src/lib</span>. The modular structure helps in making changes in any part of the operating system without having to make change in any other part.  
+	   	</p>
+	   	<p>
+	   		A detailed explanation about implementation of process manager is given in the book "Operating system design and Implementation", Section - 2. 
+	   	</p>
+	   	
+		<h4 class="make-bold">Reference:</h4>
+        <ul>
+          <p>
+            Operating System Design and Implementation, Third Edition By Andrew S. Tanenbaum and Albert S. Woodhull
+          </p>
+        </ul>
+ 	</div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+  </body>
+</html>
