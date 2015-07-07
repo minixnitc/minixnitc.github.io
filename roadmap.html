@@ -40,7 +40,165 @@
 		<li><a href="http://homepages.cs.ncl.ac.uk/nick.cook/csc2025/minix/">http://homepages.cs.ncl.ac.uk/nick.cook/csc2025/minix/</a></li>
 		<li><a href="http://homepages.cs.ncl.ac.uk/nick.cook/csc2025/minix/familiarisation.html">http://homepages.cs.ncl.ac.uk/nick.cook/csc2025/minix/familiarisation.html</a></li>
 		<li><a href="https://diuf.unifr.ch/pai/education/2004_2005/courses/OS/04_Minix_01">https://diuf.unifr.ch/pai/education/2004_2005/courses/OS/04_Minix_01</a></li></ol>
-		<h2>4. Final Implementation - Coding</h2>
+		<h2>4. Installation and setting up the system</h2>
+		<ul>
+			<li>Follow <a href="http://sudevambadi.me/MinixMajor/ref/install.html">this</a> link to install minix in virtual box</li>
+			<li>Vi editor can be used to edit the code but if you need any other editior you can install it using <code>pkgin</code> or <code>pkgin_cd</code>. Refer the link above</li>
+			<li>If installation is to be done by <code>pkgin_cd</code>, you must install virtual box extensions from <a href="https://www.virtualbox.org/wiki/Downloads">here</a></li>
+			<li>You might need to edit the <code>rc.conf</code>, if <code>pkgin_cd</code>is not working.</li>
+			<li>To transfer your code to eclipse (most preferred), follow <a href="http://wiki.minix3.org/doku.php?id=developersguide:eclipsetutorial">this</a> link</li>
+		</ul>
+
+
+		<h2>5. Final Implementation - Coding</h2>
+		<h2>File System Basic Structure</h2>
+
+		<p>The <code> /usr/src/servers/mfs </code> directory contains the source code for FS in
+		minx3.2 operating system. Some of the important files in mfs are <code>main.c, in-
+		ode.h, open.c, write.c, buf.h, super.h, super.c </code> etc. The main function of
+		each file in mfs are listed below:</p>
+		<ul>
+			<li> buf.h - Defines the block cache. It contains a union named fsdata u
+			with following attributes:
+				<ul>
+					<li> b data[MAX BLOCK SIZE], a character array, containing ordinary user data.<li>
+					<li> b dir[NR DIR ENTRIES( MAX BLOCK SIZE)] - directory block</li>
+					<li> b bitmap[[FS BITMAP CHUNKS( MAX BLOCK SIZE)]] - bitmap block</li>
+					<li> direct and indirect inode blocks</li>
+				</ul>
+			<li>cache.c - FS has a buffer cache to reduce the number of disk accesses. File contains 9 procedures, few of them are listed below.
+				<ul>
+					<li> get block - Fetch a block for reading/writing.</li>
+					<li> put block - Return a block</li>
+					<li> rw block - Transfer block between disk and cache</li>
+					<li>free zone - If file is deleted, free the zone</li>
+				</ul>
+			<li> const.h - Defines constants, like flags, table size that will be used in
+			the file system. Few constants are, IN CLEAN, IN DIRTY, ATIME,
+			CTIME etc </li>
+			<li> fs.h - Master header for FS, includes all header files needed by the MFS
+			source files </li>
+			<li> glo.h - Defines all the global variables. Few examples of global variables
+			are fs m in, fs m out, err code, fs dev, user path[PATH MAX]
+			etc. </li>
+			<li> inode.h - Contains the stucucture for inode and the inode table as in-
+			ode[NR INODES] </li>
+			<li> inode.c - Contains functions which manages the inode table. The func-
+			tions are get inode(), put inode(), rw inode(), alloc inode() etc</li>
+			<li> main.c - Contains the main routiene of the file system. The main loop
+			does three activities</li>
+			<ul>
+			<li> get work(&fs_m_in) - Gets a new work </li>
+			<li> Processes the work i.e. selects the fuction to be called to complete
+			the work and calls it from the table of function pointers.</li>
+			<li> reply(src, &fs_m_out) - Sends a reply</li>
+			</ul>
+			<li> open.c - Contains the codes for six system calls:open, close, mknode,
+			mkdir, close, lseek </li>
+			<li>proto.h - Lists all function prototypes for all functions used in MFS</li>
+			<li> read.c - All functions that are used for reading or writing are present in
+			read.c. Some of the functions include, fs readwrite, rw chunk, read map
+			etc.</li>
+			<li>super.h - Contains the superblock table. Super block holds information
+			about inode bitmap, zone bitmaps, inodes etc.</li>
+			<li> super.c - Handles the superblock table and other related data structures
+			like zone bitmap, inode bitmap etc. Major functions in this file are: al-
+			loc bit(), free bit(), get super(), read super() etc.</li>
+			<li> table.c - Contains the table that map system call numbers onto the rou-
+			tines.</li>
+			<li> write.c - Contains files that are not in read.c but are necessary for writing
+			in a file. Most important functions in write.c are write map, clear zone,
+			new block and zero block</li>
+		</ul>
+
+
+
+
+		<h3>Data Structures Involved</h3>
+		<h4>Inode</h4>
+		<p>
+		we can see that there are 7 zones of 4 bytes each, an indirect
+		zone of size 4 bytes, a double indirect node of size 4 bytes and an unused
+		space of 4 bytes. Each zone points to a disk block where actual data gets
+		stored. According to definition of immediate files we had to find a space
+		in the inode where we can store the immediate files. These zones are apt
+		place to store the immediate files because no data which is critical to the
+		file is being affected. We calcualted maximum size of immediate files as
+		40 bytes by adding up sizes of all zones, indirect zones and unused space.
+		<br>
+		<img src="images/inode.png">
+		<br>
+		<code>max size = zn sz X 7 + ud sz + idt sz + ddt sz </code><br>
+		<code> max size = 4 X 7 + 4 + 4 + 4 = 40bytes </code>
+		</p>
+		<h4>buffer or block cache</h4>
+		This is a union of different types of blocks in the
+		disk. Eg. normal data block, directory block, inode block, bitmap block
+		etc. The design of buffer or block cache is given below.
+		<img src="images/buffer.png">
+		b data array is used to cache the data which is stored in the disk block,
+		all the modifications by the user are done here and then the data is written
+		back to the disk. b data(b) is a macro which returns the pointer to the
+		first byte of b data array.</p>
+		<h4>message</h4>
+		<img src="images/message.png">
+		<p>
+		mess 1, mess 2, mess 3, . . . are different message types. In MFS,
+		global variables, fs m in and fs m out, of type message are used to
+		send and recieve messages from various servers like VFS. Following system
+		calls are used for message passing: echo, notify, sendrec, receive, send.
+		</p>
+
+		<h3>Files Involved</h3>
+		<p>
+			List of all files in which codes are added or deleted.
+			<ul>
+		<li>	/src/include/const.h - A new flag I IMMEDIATE is created to sup-
+		port immediate files </li>
+		<li> src/sys/lib/libsa/minixfs3.h - A new flag I IMMEDIATE is created
+		to support immediate files </li>
+		<li> /src/servers/vfs/open.c - When O CREATE flag is set. Set the file
+		mode as immediate instead of regular. It will have size zero.</li>
+		<img src ="code1.png">
+		<li>src/sys/sys/stat.h - Following additions are done in this file:
+		<ul>
+		<li>S_IFIMMED - macro was defined, similar to regular files<br>
+		<code>#define
+		S_IFIMMED 0130000</code><br></li>
+		<li>S_IFIMMED - macro redifined for easier usage, similar to regular
+		files.<br>
+		<code>#define S_IFIMMED S_IFIMMED</code></li>
+		<li>S_ISIMMED(m) - macro defined which checks whether a files is
+		immediate or not (similar to regular files)<br>
+		<code>#define S_ISIMMED(m) ( ( (m) & S IFMT ) == S IFIMMED )</code></li>
+		<li>There are 114 more files where we have located S ISREG(m) and added
+		S ISIMMED(m) also in the code, because regular files and immediate
+		files have same functionalities except that immediate files are stored in
+		inode and regular files are stored in disk blocks pointed by zones in the
+		inode. Few of the files are listed below:
+		<ul>
+		<li> /servers/vfs/select.c </li>
+		<li> /servers/vfs/link.c</li>
+		<li> /servers/vfs/read.c</li>
+		<li> /commands/grep/mmfile.c ... etc</li>
+		</ul>
+		</li>
+		<li>/src/severs/mfs/read.c - Major changes/addition for implementation of
+		immediate file system is done in this file, in the fs readwrite() function<br>
+		<img src="ca.png"><br>
+		<img src="cb.png"><br>
+		<img src="cc.png"><br>
+		</li>
+		</ul>
+
+		</p>
+		<p>References
+		<ul>
+		<li><a href="http://dare.ubvu.vu.nl/bitstream/handle/1871/2604/11033.pdf">Paper on immediate files</a></li>
+		<li>Operating Systems: Design And Implementation 3rd Edition by Andrew Tanenbaum</li>
+		<li><a href="report.pdf">Major Project Report</a></li>
+		</ul>
+		<p>
  	</div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
