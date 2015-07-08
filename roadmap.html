@@ -126,22 +126,22 @@
 		file is being affected. We calcualted maximum size of immediate files as
 		40 bytes by adding up sizes of all zones, indirect zones and unused space.
 		<br>
-		<img src="images/inode.png">
+		<img src="images/inode.jpg">
 		<br>
 		<code>max size = zn sz X 7 + ud sz + idt sz + ddt sz </code><br>
 		<code> max size = 4 X 7 + 4 + 4 + 4 = 40bytes </code>
 		</p>
 		<h4>buffer or block cache</h4>
-		This is a union of different types of blocks in the
+		<p>This is a union of different types of blocks in the
 		disk. Eg. normal data block, directory block, inode block, bitmap block
-		etc. The design of buffer or block cache is given below.
-		<img src="images/buffer.png">
-		b data array is used to cache the data which is stored in the disk block,
+		etc. The design of buffer or block cache is given below.</p>
+		<img src="images/buffer.jpg">
+		<p>b_data array is used to cache the data which is stored in the disk block,
 		all the modifications by the user are done here and then the data is written
 		back to the disk. b data(b) is a macro which returns the pointer to the
 		first byte of b data array.</p>
 		<h4>message</h4>
-		<img src="images/message.png">
+		<img src="images/message.jpg">
 		<p>
 		mess 1, mess 2, mess 3, . . . are different message types. In MFS,
 		global variables, fs m in and fs m out, of type message are used to
@@ -159,7 +159,7 @@
 		to support immediate files </li>
 		<li> /src/servers/vfs/open.c - When O CREATE flag is set. Set the file
 		mode as immediate instead of regular. It will have size zero.</li>
-		<img src ="code1.png">
+		<img src ="images/code11.jpg">
 		<li>src/sys/sys/stat.h - Following additions are done in this file:
 		<ul>
 		<li>S_IFIMMED - macro was defined, similar to regular files<br>
@@ -185,9 +185,9 @@
 		</li>
 		<li>/src/severs/mfs/read.c - Major changes/addition for implementation of
 		immediate file system is done in this file, in the fs readwrite() function<br>
-		<img src="ca.png"><br>
-		<img src="cb.png"><br>
-		<img src="cc.png"><br>
+		<img src="images/code2.jpg"><br>
+		<img src="images/code1.jpg"><br>
+		<img src="images/code.jpg"><br>
 		</li>
 		</ul>
 
